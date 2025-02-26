@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - main  # Trigger the workflow on push to the main branch
-
+  pull_request:
+    branches:
+      - main  # Trigger on PR to the main branch
+  workflow_dispatch:  # Allow manual trigger of the workflow
+  
 jobs:
   build:
     runs-on: ubuntu-latest
