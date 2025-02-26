@@ -124,7 +124,11 @@
     "author": "Luis Zuno",
     "site": "https://www.luiszuno.com",
     "test": false
-  },
+  },  "id": "00024",
+  "title": "His partner was arrested :(",
+  "author": "SketchySkiddieDev",
+  "site": "",
+  "test": false
   {
     "id": "00018",
     "title": "X",
@@ -166,12 +170,5 @@
     "author": "Zero",
     "site": "",
     "test": false
-  },
-  {
-  "id": "00024",
-  "title": "His partner was arrested :(",
-  "author": "SketchySkiddieDev",
-  "site": "",
-  "test": false
   }
 ]
