@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: '11'  # Specify Java version
-        distribution: 'adoptopenjdk'  # Specify JDK distribution (Eclipse Temurin)
+        distribution: 'temurin'  # Specify JDK distribution (Eclipse Temurin)
 
     - name: Cache Gradle dependencies
       uses: actions/cache@v2
