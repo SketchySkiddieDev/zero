@@ -66,16 +66,19 @@ jobs:
     - name: Get version name from Gradle
       id: get_version
       run: |
-        VERSION_NAME=$(./gradlew -q printVersionName)  # Capture output from Gradle
-        VERSION_NAME=$(echo "$VERSION_NAME" | tr -d '\r\n')  # Remove any unwanted carriage returns/newlines
-        echo "VERSION_NAME=$VERSION_NAME"  # Debug the extracted version name
-        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV  # Store the version name in GitHub environment
+        # Capture the version name cleanly from Gradle output
+        VERSION_NAME=$(./gradlew -q printVersionName)
+        
+        # Clean up the version string: remove any extra spaces or newlines
+        VERSION_NAME=$(echo "$VERSION_NAME" | tr -d '\r\n')  # Remove carriage returns and newlines
+        VERSION_NAME=$(echo "$VERSION_NAME" | sed 's/[[:space:]]//g')  # Remove any extra spaces
 
-    - name: Create a Git tag
-      run: |
-        echo "Tagging with version: $VERSION_NAME"  # Debug: show the version name before tagging
-        git tag "v$VERSION_NAME"  # Tag using version name or code
-        git push origin "v$VERSION_NAME"  # Push the tag to GitHub
+        # Check what was captured (for debugging purposes)
+        echo "Captured Version Name: '$VERSION_NAME'"
+
+        # Export the clean version name for later use
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+
 
 
     - name: Upload APK to GitHub Releases
