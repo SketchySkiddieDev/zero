@@ -15,17 +15,17 @@ android {
     lintOptions {
         abortOnError false
     }
+
     signingConfigs {
         release {
-            if (System.getenv("GITHUB_ACTIONS") != null) {
-                // Configure keystore using GitHub Actions secrets
-                storeFile = file(System.getenv("KEYSTORE_PATH"))
-                storePassword = System.getenv("KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("KEYSTORE_ALIAS")
-                keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD")
-            }
+            // Configure keystore using GitHub Actions secrets (make sure these environment variables are set)
+            storeFile = file(System.getenv("KEYSTORE_PATH"))
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEYSTORE_ALIAS")
+            keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD")
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -33,6 +33,7 @@ android {
             signingConfig signingConfigs.release
         }
     }
+
     aaptOptions {
         cruncherEnabled = false
     }
