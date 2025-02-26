@@ -66,16 +66,7 @@ jobs:
 
     - name: Tag the release with version from gradle
       run: |
-        VERSION_TAG="v${{ env.VERSION }}"  # Use the version from gradle      uses: softprops/action-gh-release@v1
-
-      with:
-
-        files: app/build/outputs/apk/release/app-release.apk
-
-      env:
-
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}.
-
+        VERSION_TAG="v${{ env.VERSION }}"  # Use the version from gradle
         echo "Tagging release with version: $VERSION_TAG"
         git tag "$VERSION_TAG"  # Create the tag
         git push origin "$VERSION_TAG"  # Push the tag to GitHub
