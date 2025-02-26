@@ -2,6 +2,8 @@ name: Build and Publish APK
 
 on:
   push:
+   tags:
+      - 'v*.*.*'  # This will trigger on version tags like v1.0.0, v1.1.0, etc.
     branches:
       - main  # Trigger the workflow on push to the main branch
   pull_request:
