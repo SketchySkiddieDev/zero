@@ -42,6 +42,11 @@ jobs:
         echo "KEYSTORE_ALIAS=${{ secrets.KEYSTORE_ALIAS }}" >> $GITHUB_ENV
         echo "KEYSTORE_ALIAS_PASSWORD=${{ secrets.KEYSTORE_ALIAS_PASSWORD }}" >> $GITHUB_ENV
 
+    - name: Verify keystore exists
+      run: |
+        echo "Keystore path: $HOME/keystore.jks"
+        ls -l $HOME/keystore.jks  # Check if the keystore exists
+
     - name: Build the APK
       run: ./gradlew assembleRelease
 
@@ -56,4 +61,3 @@ jobs:
         files: app/build/outputs/apk/release/app-release.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
