@@ -72,8 +72,10 @@ jobs:
 
     - name: Create a Git tag
       run: |
-        git tag "v$VERSION_NAME"  # Tag using version name or code
-        git push origin "v$VERSION_NAME"  # Push the tag to GitHub
+        VERSION_NAME=$(./gradlew -q printVersionName)  # Capture output from Gradle
+        VERSION_NAME=$(echo "$VERSION_NAME" | tr -d '\r\n')  # Remove any unwanted carriage returns/newlines
+        echo "VERSION_NAME=$VERSION_NAME"  # Debug the extracted version name
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV  # Store the version name in GitHub environment
 
     - name: Upload APK to GitHub Releases
       uses: softprops/action-gh-release@v1
