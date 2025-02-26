@@ -37,7 +37,7 @@ android {
     def isRunningOnTravis = System.getenv("CI") == "true"
     if (isRunningOnTravis) {
         // configure keystore
-        signingConfigs.release.storeFile = file("../android_keystore.jks")
+        signingConfigs.release.storeFile = System.getenv("KEYSTORE_PATH")
         signingConfigs.release.storePassword = System.getenv("KEYSTORE_PASSWORD")
         signingConfigs.release.keyAlias = System.getenv("KEYSTORE_ALIAS")
         signingConfigs.release.keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD")
