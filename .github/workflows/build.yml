@@ -35,7 +35,12 @@ jobs:
       uses: gradle/gradle-build-action@v2
 
     - name: Decode keystore
-      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android-keystore.jks
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > $HOME/keystore.jks
+        echo "KEYSTORE_PATH=$HOME/keystore.jks" >> $GITHUB_ENV
+        echo "KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+        echo "KEYSTORE_ALIAS=${{ secrets.KEYSTORE_ALIAS }}" >> $GITHUB_ENV
+        echo "KEYSTORE_ALIAS_PASSWORD=${{ secrets.KEYSTORE_ALIAS_PASSWORD }}" >> $GITHUB_ENV
 
     - name: Build the APK
       run: ./gradlew assembleRelease
@@ -51,3 +56,4 @@ jobs:
         files: app/build/outputs/apk/release/app-release.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+v
