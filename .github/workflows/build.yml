@@ -66,16 +66,17 @@ jobs:
     - name: Get version name from Gradle
       id: get_version
       run: |
-        VERSION_NAME=$(./gradlew -q printVersionName | tr -d '\r\n')  # Remove newlines or carriage returns
+        VERSION_NAME=$(./gradlew -q printVersionName)  # Capture output from Gradle
+        VERSION_NAME=$(echo "$VERSION_NAME" | tr -d '\r\n')  # Remove any unwanted carriage returns/newlines
         echo "VERSION_NAME=$VERSION_NAME"  # Debug the extracted version name
         echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV  # Store the version name in GitHub environment
 
     - name: Create a Git tag
       run: |
-        VERSION_NAME=$(./gradlew -q printVersionName)  # Capture output from Gradle
-        VERSION_NAME=$(echo "$VERSION_NAME" | tr -d '\r\n')  # Remove any unwanted carriage returns/newlines
-        echo "VERSION_NAME=$VERSION_NAME"  # Debug the extracted version name
-        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV  # Store the version name in GitHub environment
+        echo "Tagging with version: $VERSION_NAME"  # Debug: show the version name before tagging
+        git tag "v$VERSION_NAME"  # Tag using version name or code
+        git push origin "v$VERSION_NAME"  # Push the tag to GitHub
+
 
     - name: Upload APK to GitHub Releases
       uses: softprops/action-gh-release@v1
