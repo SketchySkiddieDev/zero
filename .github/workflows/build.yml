@@ -62,10 +62,16 @@ jobs:
       run: |
         ./gradlew signingReport
         ./gradlew assembleRelease -PsigningConfig=release
-    
+     
+    - name: Get version name from Gradle
+      id: get_version
+      run: |
+        VERSION_NAME=$(./gradlew -q printVersionName | tr -d '\r\n')  # Remove newlines or carriage returns
+        echo "VERSION_NAME=$VERSION_NAME"  # Debug the extracted version name
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV  # Store the version name in GitHub environment
+
     - name: Create a Git tag
       run: |
-        VERSION_NAME=$(./gradlew -q printVersionName)  # or extract version dynamically
         git tag "v$VERSION_NAME"  # Tag using version name or code
         git push origin "v$VERSION_NAME"  # Push the tag to GitHub
 
