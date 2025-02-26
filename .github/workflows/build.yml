@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - main  # Trigger on PR to the main branch
-  workflow_dispatch:  # Allow manual trigger of the workflow
+  workflow_dispatch:  # Allow manual trigger of the workflow and add input for manual tag
 
 jobs:
   build:
@@ -50,46 +50,18 @@ jobs:
     - name: Build the APK
       run: ./gradlew assembleRelease
 
-    - name: Get version name
-      id: version
+    - name: Sign the APK
       run: |
-        VERSION_NAME=$(./gradlew -q printVersionName)
-        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
-        echo "::set-output name=version_name::$VERSION_NAME" # Optional output for later use
+        ./gradlew signingReport
+        ./gradlew assembleRelease -PsigningConfig=release
 
-    - name: Check if tag exists
-      id: check_tag
+    - name: Tag the release (manual input)
       run: |
-        TAG_EXISTS=$(git tag -l "v${{ env.VERSION_NAME }}")
-        if [ -n "$TAG_EXISTS" ]; then
-          echo "Tag v${{ env.VERSION_NAME }} already exists. Skipping tag creation."
-          echo "tag_exists=true" >> $GITHUB_ENV
-        else
-          echo "Tagging with version: ${{ env.VERSION_NAME }}"
-          git tag "v${{ env.VERSION_NAME }}"
-          echo "tag_exists=false" >> $GITHUB_ENV
-        fi
-
-    - name: Push tag if not exists
-      run: |
-        if [ "${{ env.tag_exists }}" == "false" ]; then
-          git push origin "v${{ env.VERSION_NAME }}"
-        else
-          echo "Tag already exists, skipping push."
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    # Optional: Force push the tag if needed (use caution)
-    - name: Force push the tag (optional)
-      run: |
-        if [ "${{ env.tag_exists }}" == "false" ]; then
-          echo "Tagging and force-pushing v${{ env.VERSION_NAME }}"
-          git tag -f "v${{ env.VERSION_NAME }}"
-          git push --force origin "v${{ env.VERSION_NAME }}"
-        fi
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        echo "Enter the version tag for the release (e.g., v1.0.0):"
+        read VERSION_TAG
+        echo "Tagging release with version: $VERSION_TAG"
+        git tag "$VERSION_TAG"  # Manually create the tag
+        git push origin "$VERSION_TAG"  # Push the tag to GitHub
 
     - name: Upload APK to GitHub Releases
       uses: softprops/action-gh-release@v1
