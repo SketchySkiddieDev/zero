@@ -62,6 +62,12 @@ jobs:
       run: |
         ./gradlew signingReport
         ./gradlew assembleRelease -PsigningConfig=release
+    
+    - name: Create a Git tag
+      run: |
+        VERSION_NAME=$(./gradlew -q printVersionName)  # or extract version dynamically
+        git tag "v$VERSION_NAME"  # Tag using version name or code
+        git push origin "v$VERSION_NAME"  # Push the tag to GitHub
 
     - name: Upload APK to GitHub Releases
       uses: softprops/action-gh-release@v1
