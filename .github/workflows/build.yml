@@ -57,9 +57,9 @@ jobs:
 
     - name: Tag the release with hardcoded version
       run: |
-        VERSION_TAG="v2.0.15"  # Hardcoded version
+        VERSION_TAG="v2.0.10"  # Hardcoded version
         echo "Tagging release with version: $VERSION_TAG"
-        git tag "$VERSION_TAG"  # Manually create the tag
+        git tag "$VERSION_TAG"  # Create the tag
         git push origin "$VERSION_TAG"  # Push the tag to GitHub
 
     - name: Upload APK to GitHub Releases
