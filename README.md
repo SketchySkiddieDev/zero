@@ -1,4 +1,4 @@
-
+new maintainer, expect shit to be ugly till i get shit right
 
 <img src="zero/src/main/ic_launcher-playstore.png" align="left"
 width="200"
