@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 30
     buildToolsVersion '30.0.3'
+
     defaultConfig {
         applicationId "com.zero.zerolivewallpaper"
         minSdkVersion 16
@@ -12,17 +13,13 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
     }
-    lintOptions {
-        abortOnError false
-    }
 
     signingConfigs {
         release {
-            // Configure keystore using GitHub Actions secrets (make sure these environment variables are set)
-            storeFile = file(System.getenv("KEYSTORE_PATH"))
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("KEYSTORE_ALIAS")
-            keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD")
+            storeFile = file(System.getenv("KEYSTORE_PATH"))  // Keystore path
+            storePassword = System.getenv("KEYSTORE_PASSWORD")  // Keystore password
+            keyAlias = System.getenv("KEYSTORE_ALIAS")  // Keystore alias
+            keyPassword = System.getenv("KEYSTORE_ALIAS_PASSWORD")  // Key password
         }
     }
 
@@ -31,16 +28,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
-        }
-    }
-
-    aaptOptions {
-        cruncherEnabled = false
-    }
-
-    task printVersionName {
-        doLast {
-            println android.defaultConfig.versionName
         }
     }
 }
