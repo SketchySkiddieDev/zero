@@ -7,7 +7,7 @@ on:
   pull_request:
     branches:
       - main  # Trigger on PR to the main branch
-  workflow_dispatch:  # Allow manual trigger of the workflow and add input for manual tag
+  workflow_dispatch:  # Allow manual trigger of the workflow
 
 jobs:
   build:
@@ -55,10 +55,9 @@ jobs:
         ./gradlew signingReport
         ./gradlew assembleRelease -PsigningConfig=release
 
-    - name: Tag the release (manual input)
+    - name: Tag the release with hardcoded version
       run: |
-        echo "Enter the version tag for the release (e.g., v1.0.0):"
-        read VERSION_TAG
+        VERSION_TAG="v2.0.15"  # Hardcoded version
         echo "Tagging release with version: $VERSION_TAG"
         git tag "$VERSION_TAG"  # Manually create the tag
         git push origin "$VERSION_TAG"  # Push the tag to GitHub
