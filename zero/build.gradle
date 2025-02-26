@@ -38,11 +38,11 @@ android {
     }
 
     // Define the printVersionName task
-    task printVersionName {
-        doLast {
-            println android.defaultConfig.versionName  // This prints the versionName
-        }
+task printVersion {
+    doLast {
+        println project.version  // Print the version directly
     }
+}
 }
 
 dependencies {
