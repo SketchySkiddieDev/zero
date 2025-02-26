@@ -3,11 +3,11 @@ name: Build and Publish APK
 on:
   push:
     branches:
-      - main
+      - main  # Trigger the workflow on push to the main branch
   pull_request:
     branches:
-      - main
-  workflow_dispatch:
+      - main  # Trigger on PR to the main branch
+  workflow_dispatch:  # Allow manual trigger of the workflow
 
 jobs:
   build:
@@ -20,8 +20,8 @@ jobs:
     - name: Set up JDK 11
       uses: actions/setup-java@v2
       with:
-        java-version: '11'
-        distribution: 'temurin'
+        java-version: '11'  # Specify Java version
+        distribution: 'temurin'  # Specify JDK distribution (Eclipse Temurin)
 
     - name: Cache Gradle dependencies
       uses: actions/cache@v2
@@ -42,29 +42,54 @@ jobs:
         echo "KEYSTORE_ALIAS=${{ secrets.KEYSTORE_ALIAS }}" >> $GITHUB_ENV
         echo "KEYSTORE_ALIAS_PASSWORD=${{ secrets.KEYSTORE_ALIAS_PASSWORD }}" >> $GITHUB_ENV
 
-    - name: Get version name from Gradle
-      id: get_version
+    - name: Verify keystore exists
       run: |
-        # Capture the version name cleanly from Gradle output
-        VERSION_NAME=$(./gradlew -q printVersionName)
-
-        # Clean up the version string by removing unwanted lines (e.g., 'GotbuildFinished')
-        VERSION_NAME=$(echo "$VERSION_NAME" | grep -oP '\d+\.\d+\.\d+')  # Match the version pattern (e.g., 2.0.10)
-
-        # Check the captured version name (for debugging purposes)
-        echo "Captured Version Name: '$VERSION_NAME'"
-
-        # Export the clean version name for later use
-        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
-
-    - name: Create a Git tag
-      run: |
-        echo "Tagging with version: $VERSION_NAME"
-        git tag "v$VERSION_NAME"
-        git push origin "v$VERSION_NAME"  # Ensure the tag is pushed to the remote repository
+        echo "Keystore path: $HOME/keystore.jks"
+        ls -l $HOME/keystore.jks  # Check if the keystore exists
 
     - name: Build the APK
       run: ./gradlew assembleRelease
+
+    - name: Get version name
+      id: version
+      run: |
+        VERSION_NAME=$(./gradlew -q printVersionName)
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+        echo "::set-output name=version_name::$VERSION_NAME" # Optional output for later use
+
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        TAG_EXISTS=$(git tag -l "v${{ env.VERSION_NAME }}")
+        if [ -n "$TAG_EXISTS" ]; then
+          echo "Tag v${{ env.VERSION_NAME }} already exists. Skipping tag creation."
+          echo "tag_exists=true" >> $GITHUB_ENV
+        else
+          echo "Tagging with version: ${{ env.VERSION_NAME }}"
+          git tag "v${{ env.VERSION_NAME }}"
+          echo "tag_exists=false" >> $GITHUB_ENV
+        fi
+
+    - name: Push tag if not exists
+      run: |
+        if [ "${{ env.tag_exists }}" == "false" ]; then
+          git push origin "v${{ env.VERSION_NAME }}"
+        else
+          echo "Tag already exists, skipping push."
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # Optional: Force push the tag if needed (use caution)
+    - name: Force push the tag (optional)
+      run: |
+        if [ "${{ env.tag_exists }}" == "false" ]; then
+          echo "Tagging and force-pushing v${{ env.VERSION_NAME }}"
+          git tag -f "v${{ env.VERSION_NAME }}"
+          git push --force origin "v${{ env.VERSION_NAME }}"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload APK to GitHub Releases
       uses: softprops/action-gh-release@v1
