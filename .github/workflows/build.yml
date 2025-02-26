@@ -49,6 +49,13 @@ jobs:
         echo "Keystore path: $HOME/keystore.jks"
         ls -l $HOME/keystore.jks  # Check if the keystore exists
 
+    - name: Get version from gradle
+      id: get_version
+      run: |
+        VERSION=$(./gradlew -q printVersion)  # This assumes you have a task to print the version
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "The version is: $VERSION"
+
     - name: Build the APK
       run: ./gradlew assembleRelease
 
@@ -57,9 +64,18 @@ jobs:
         ./gradlew signingReport
         ./gradlew assembleRelease -PsigningConfig=release
 
-    - name: Tag the release with hardcoded version
+    - name: Tag the release with version from gradle
       run: |
-        VERSION_TAG="v2.0.16"  # Hardcoded version
+        VERSION_TAG="v${{ env.VERSION }}"  # Use the version from gradle      uses: softprops/action-gh-release@v1
+
+      with:
+
+        files: app/build/outputs/apk/release/app-release.apk
+
+      env:
+
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}.
+
         echo "Tagging release with version: $VERSION_TAG"
         git tag "$VERSION_TAG"  # Create the tag
         git push origin "$VERSION_TAG"  # Push the tag to GitHub
